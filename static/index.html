@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+        integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <link rel="stylesheet" href="http://127.0.0.1:3010/static/index.css">
+    <title>Real-ESRGAN</title>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1 class="title">Real-ESRGAN</h1>
+            <div class="subtitle">The Art of Intelligent Upscaling</div>
+        </header>
+
+        <main>
+            <div class="controller glass-card">
+                <div class="app-version"><span>App Version:</span> <span>2.0</span></div>
+                <div class="control-group">
+                    <div class="switch-wrapper">
+                        <span class="label">TTA Mode</span>
+                        <label class="switch">
+                            <input type="checkbox" name="tta">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="theme-toggle">
+                        <span class="label">Color Mode</span>
+                        <div class="main-theme-switch">
+                            <label class="switch">
+                                <input type="checkbox" id="theme-switch">
+                                <span class="slider round"></span>
+                            </label>
+                            <i class="fa-solid fa-moon"></i>
+                            <i class="fa-solid fa-sun"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <span class="label">GPU</span>
+                    <div class="custom-select" id="gpuSelect">
+                        <div class="select-selected">CPU</div>
+                        <div class="select-items">
+                            <div class="select-item" data-value="{{ gpu.name }}"></div>
+                            <div class="select-item selected" data-value="Default GPU"></div>
+                        </div>
+                        <input type="hidden" name="gpu_id" value="Default GPU">
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <span class="label">Model</span>
+                    <div class="custom-select" id="modelSelect">
+                        <div class="select-selected">4xHFA2k</div>
+                        <div class="select-items">
+                            <div class="select-item selected" data-value="4xHFA2k">4xHFA2k</div>
+                            <div class="select-item" data-value="4xLSDIR">4xLSDIR</div>
+                            <div class="select-item" data-value="4xLSDIRplusC">4xLSDIRplusC</div>
+                            <div class="select-item" data-value="4xLSDIRCompactC3">4xLSDIRCompactC3</div>
+                            <div class="select-item" data-value="4xNomos8kSC">4xNomos8kSC</div>
+                            <div class="select-item" data-value="4x_NMKD-Siax_200k">4x_NMKD-Siax_200k</div>
+                            <div class="select-item" data-value="4x_NMKD-Superscale-SP_178000_G">
+                                4x_NMKD-Superscale-SP_178000_G</div>
+                            <div class="select-item" data-value="RealESRGAN_General_WDN_x4_v3">
+                                RealESRGAN_General_WDN_x4_v3</div>
+                            <div class="select-item" data-value="RealESRGAN_General_x4_v3">RealESRGAN_General_x4_v3
+                            </div>
+                        </div>
+                        <input type="hidden" name="model" value="4xHFA2k">
+                    </div>
+                </div>
+
+                <div class="button-container">
+                    <button class="btn btn-secondary" onclick="location.reload()">Reload UI</button>
+                    <button class="btn btn-secondary" onclick="clearHistory()">Clear History</button>
+                    <button class="btn btn-danger hidden" id="cancelBtn" onclick="cancelProcessing()">Cancel
+                        Processing</button>
+                    <button class="btn btn-primary" id="upscaleBtn" onclick="startProcessing()" disabled>Upscale
+                        Images</button>
+                    <button id="downloadAllBtn" class="download-btn btn-success hidden" onclick="downloadAll()">Download
+                        All</button>
+                </div>
+            </div>
+
+            <div class="canvas">
+                <div class="glass-card">
+                    <div class="drop-zone" id="dropZone" ondragover="handleDragOver(event)" ondrop="handleDrop(event)">
+                        <svg class="upload-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                        </svg>
+                        <p>Drag and drop images here or click to upload</p>
+                        <span class="image-counter" id="imageCounter">Added Images: 0</span>
+                        <input type="file" id="fileInput" hidden accept="image/*" multiple>
+                    </div>
+
+                    <div class="total-progress-container progress-container">
+                        <div class="total-progress-bar progress-bar" style="width: 0%"></div>
+                        <div class="total-progress-text progress-text">0%</div>
+                    </div>
+                </div>
+
+                <div class="preview-container">
+                    <div class="preview-section glass-card">
+                        <h3 class="preview-title" id="addedImagesLabel">Added Images</h3>
+                        <div class="preview-grid" id="addedImagesContainer"></div>
+                    </div>
+
+                    <div class="preview-section glass-card">
+                        <h3 class="preview-title">Processed Images</h3>
+                        <div class="preview-grid" id="processedImagesContainer"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="http://127.0.0.1:3010/static/index.js"></script>
+</body>
+
+</html>
