@@ -1,10 +1,10 @@
 
-<img src="https://github.com/Md-Siam-Mia-Code/Real-ESRGAN/blob/main/assets/Banner.png" alt="Real-ESRGAN Banner"/>  
+<img src="https://github.com/Md-Siam-Mia-Man/Real-ESRGAN/blob/main/assets/Banner.png" alt="Real-ESRGAN Banner"/>  
 
 # ✨ Real-ESRGAN ✨
 ## 🚀 The Art of Intelligent Upscaling! 🚀
 
-<img src="https://github.com/Md-Siam-Mia-Code/Real-ESRGAN/blob/main/assets/Real-ESRGAN.png" alt="Real-ESRGAN UI"/>  
+<img src="https://github.com/Md-Siam-Mia-Man/Real-ESRGAN/blob/main/assets/Real-ESRGAN.png" alt="Real-ESRGAN UI"/>  
 
 ## 🗂 Table of Contents
 - 📖 [Overview](#-overview)
@@ -59,7 +59,7 @@ Whether you're looking to revitalize old photographs, improve low-resolution gam
 
 ```bash
 # Clone the magic portal (or download ZIP)
-git clone https://github.com/Md-Siam-Mia-Code/Real-ESRGAN.git
+git clone https://github.com/Md-Siam-Mia-Man/Real-ESRGAN.git
 cd Real-ESRGAN
 
 # Create a virtual environment (Recommended)
